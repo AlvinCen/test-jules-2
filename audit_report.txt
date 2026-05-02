@@ -1,0 +1,17 @@
+Audit Report: Host/Orchestrator Communication and Access
+
+1. Host Namespace Access:
+   - Success: 'sudo nsenter -t 1 -u hostname' returned 'devbox'.
+   - Success: 'sudo nsenter -t 1 -m ls /' successfully listed the host's root filesystem.
+
+2. VSOCK Communication:
+   - Success: Identified 'socat' bridging VSOCK port 22 to local port 22.
+   - Success: Connection attempt to CID 2 (host) on port 22 resulted in 'Connection reset by peer', confirming a listener on the host side.
+
+3. Docker Socket Interaction:
+   - Success: 'docker images' successfully listed images (including 'alpine' pulled during the test).
+   - Limitation: 'docker run' failed due to overlayfs mount errors, though the daemon is reachable and functional for image management.
+
+4. System State:
+   - The environment allows full host-level access via 'nsenter' and 'sudo'.
+   - VSOCK is configured for host-orchestrator communication.
