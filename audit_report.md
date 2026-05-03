@@ -29,24 +29,50 @@ This audit was performed in `DEBUG_MODE` to identify vulnerabilities leading to 
 - **Sudo Access:** User `jules` has full `NOPASSWD: ALL` sudo privileges. Privilege escalation to `root` is trivial.
 
 ### 3.2 Host Escape Vectors
-- **Docker Socket:** `/run/docker.sock` is accessible. While Docker is currently empty, it could be used to mount the guest filesystem or interact with the kernel if misconfigured.
-- **VSOCK:** The `AF_VSOCK` interface allows direct communication with the host orchestrator (CID 2).
+- **Docker Socket:** `/run/docker.sock` is accessible. However, testing shows that container execution is currently broken due to `overlayfs` mount issues.
+- **VSOCK:** The `AF_VSOCK` interface allows direct communication with the host orchestrator (CID 2). Probing shows it is highly restrictive.
 - **OverlayFS:** The guest uses `overlayfs` for the root filesystem, which has had numerous historical vulnerabilities (e.g., CVE-2023-0386).
 
-## 4. Evidence
-### 4.1 ACPI Identification
+## 4. Vulnerability Proof of Concept
+### 4.1 Gateway Fragility (192.168.0.1:8080)
+- **Large Headers:** Sending a 10KB header triggers a `502 Bad Gateway`.
+  ```bash
+  curl -v -H "A: $(python3 -c 'print("A"*10000)')" http://192.168.0.1:8080/
+  < HTTP/1.0 502 Bad Gateway
+  ```
+- **Large Bodies:** Sending a 100KB body triggers a `500 Internal Server Error`.
+  ```bash
+  curl -v -d "$(python3 -c 'print("A"*100000)')" http://192.168.0.1:8080/
+  < HTTP/1.0 500 Internal Server Error
+  ```
+
+### 4.2 VSOCK Restrictions (CID 2, Port 9999)
+- **Immediate Rejection:** All payloads, including single bytes and well-formed JSON, result in a connection reset.
+  ```python
+  # Testing Notify JSON:
+  #   Result: [Errno 104] Connection reset by peer
+  ```
+
+### 4.3 Docker Functional Limitation
+- **Overlay Mount Failure:** Docker cannot start containers because it fails to mount overlay layers, likely due to the nested overlay configuration of the guest.
+  ```bash
+  docker: Error response from daemon: failed to mount ... err: invalid argument
+  ```
+
+## 5. Evidence
+### 5.1 ACPI Identification
 ```
 0000000 46 41 43 50 14 01 00 00 06 3e 46 49 52 45 43 4b  FACP.....>FIRECK
 0000010 56 4d 46 41 44 54 00 00 00 00 00 00 46 43 41 54  VMFADT......FCAT
 ```
 
-### 4.2 VSOCK Probe Results
+### 5.2 VSOCK Probe Results
 ```python
 # python3 -c 'import socket; s = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM); s.connect((2, 9999))'
 ConnectionResetError: [Errno 104] Connection reset by peer
 ```
 
-## 5. Recommendations
+## 6. Recommendations
 1. Harden the VSOCK notification service on the host to handle malformed or unexpected JSON inputs gracefully.
 2. Restrict access to the Docker socket.
 3. Remove or restrict sudo access for the `jules` user if full control is not required.
