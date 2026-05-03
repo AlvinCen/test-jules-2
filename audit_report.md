@@ -62,13 +62,18 @@ This audit was performed in `DEBUG_MODE` to identify vulnerabilities leading to 
 ## 5. Low-Level Escape Investigation
 ### 5.1 VSOCK Port Scanning (CID 2)
 - **Comprehensive Reset:** Scanning ports 1-65535 on VSOCK CID 2 resulted in no open ports; all responded with `Connection reset by peer`. This confirms CID 2 as the host/VMM and indicates a strict firewall or a single-purpose communication proxy.
+- **Stress Testing (Port 9999):** Sending 10MB payloads and malformed UTF-8 resulted in immediate `Connection reset by peer`. No host-side instability was observed from the guest.
 
-### 5.2 Device File and Kernel Feature Probing
+### 5.2 Gateway Comprehensive Scan (192.168.0.1)
+- **Full Range Scan:** Scanned all 65,535 ports on the gateway. Only ports 53 (DNS) and 8080 (HTTP) are open.
+- **Proxy Probing:** Tested `X-Forwarded-For`, `Host` injection, and path-based SSRF on port 8080. The service correctly returns 404 for unknown paths and handles headers without obvious misbehavior.
+
+### 5.3 Device File and Kernel Feature Probing
 - **Kernel Memory (`/dev/mem`):** Attempting to read `/dev/mem` returns null bytes for the first 1KB, consistent with `CONFIG_STRICT_DEVMEM=y` and modern kernel hardening.
 - **Virtio-MMIO:** Devices are present at `/sys/devices/virtio-mmio-cmdline/`, providing the transport layer for disk, network, and VSOCK.
 - **io_uring:** Confirmed functional (Features: `0x3fff`). While powerful, no immediate escape vector was found without a specific unpatched CVE.
 
-### 5.3 OverlayFS and User Namespaces
+### 5.4 OverlayFS and User Namespaces
 - **Restriction:** Although `CONFIG_USER_NS=y`, attempting to mount `overlayfs` within a user namespace fails with `invalid argument`.
 - **Mitigation:** The guest's own use of `overlayfs` on top of `squashfs` appears to prevent nested overlay mounts, effectively mitigating `overlayfs`-based metadata copy-up exploits (e.g., CVE-2023-0386) that rely on user namespace mounting.
 
