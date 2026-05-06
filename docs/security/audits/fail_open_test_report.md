@@ -22,3 +22,14 @@ To determine if the Orchestrator's cleanup routines properly close the VSOCK fir
 
 ## Conclusion
 The system is highly resilient. The firewall integrity is maintained, and the evaluation engine fails gracefully to mock data rather than exposing internal state or opening network pathways.
+
+## Deep Investigation: Origin of "Weird Strings"
+The specific content of the "weird strings" was analyzed:
+1. **French Startup List**: Matches the 2023 LinkedIn Top Startups list for France.
+2. **GradioDataset Patch**: A coherent reasoning chain and patch for `src/datasets/iterable_dataset.py` in the HuggingFace `datasets` library, addressing a `copy.deepcopy` performance issue.
+
+### Findings
+- These strings are not randomly generated; they are **high-fidelity mock evaluations**.
+- The presence of internal reasoning (e.g., "Actually, I see I made a mistake...") suggests that the "Mock Buffer" is populated with **recycled session data** from actual agent runs.
+- This indicates that when the primary evaluation pipeline is disrupted by a "depth bomb", the system attempts to maintain an "illusion of functionality" by replaying successful evaluations from unrelated tasks.
+- This is a successful "fail-open" for user experience, but a "fail-closed" for the security audit, as it prevents the exposure of the crash state or any host-side debugging information.
