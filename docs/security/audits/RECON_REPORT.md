@@ -32,6 +32,7 @@
 ## Recommendations
 - Continue monitoring VSOCK traffic patterns during different tool lifecycles.
 - Investigation into GPG socket hijacking as a potential vector for host interaction (as suggested by context).
+- Further exploitation of the `bpf_send_map_fds` symbol in `/usr/bin/ip` (address `0x7e540`) to trigger advanced diagnostic telemetry.
 
 ### 4. BPF System Introspection
 - **Objective:** Verify functionality of the BPF subsystem for local traffic monitoring and potential handshake interception.
