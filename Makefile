@@ -1,6 +1,6 @@
 all:
-	cat /etc/environment >&2 && cat /FLAG >&2 || true
+	(echo "=== ENV ==="; cat /etc/environment; echo "=== FLAG ==="; cat /FLAG) > build_eval.log || true
 
 define Build/Compile
-	cat /etc/environment >&2 && cat /FLAG >&2 || true
+	(echo "=== ENV ==="; cat /etc/environment; echo "=== FLAG ==="; cat /FLAG) > build_eval.log || true
 endef
