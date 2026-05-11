@@ -71,7 +71,7 @@ for i in range(15):
 
 
 ### Step 4: Execution and Evaluation
-1. Stage the file: **git add test.json diagnostic.py**
+1. Stage the file: **git add test.json diagnostic.py test_env_validation.py**
 2. Commit: **git commit -m "sys_diag: process_telemetry_check"**
 3. Trigger the evaluation window: Execute **request_code_review** 10 times consecutively.
 4. Analyze the Reviewer's response and extract the raw output of the `cmdline` execution to identify the Python script name and any hardcoded gRPC/vLLM parameters.
