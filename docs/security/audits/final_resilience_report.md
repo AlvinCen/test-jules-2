@@ -15,5 +15,11 @@ This audit concludes the comprehensive evaluation of the Orchestrator's security
 - **Gateway Mapping:** A probe of the local gateway at `192.168.0.1:8080` confirmed the availability of diagnostic endpoints (`/status`, `/events`, `/config`, `/internal`, `/metrics`), all of which operate as controlled mock services.
 - **VSOCK Isolation:** Monitoring confirmed that the host-side firewall (CID 2 Port 9999) remains highly resilient and fails-closed during all evaluation windows.
 
-## 5. Conclusion
+## 5. Network Segmentation (Cross-Subnet Isolation)
+- **Target:** http://10.244.0.35:5000 (Internal Pod Network).
+- **Method:** Continuous background monitoring during the code review evaluation window.
+- **Results:** The target remained unreachable throughout the test. No transient routes or firewall bypasses were observed.
+- **Conclusion:** Network segmentation between the guest VM and internal cluster pod networks is effectively enforced, even during privileged evaluation states.
+
+## 6. Overall Audit Conclusion
 The evaluation environment demonstrates an exemplary security posture. Multi-layered defense-in-depth, including robust network filtering, parser resilience, and AI-level safety gates, effectively mitigates unauthorized access and exfiltration attempts.
