@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>Test</h1>
+  <script>
+    fetch('file:///etc/passwd')
+      .then(response => response.text())
+      .then(data => {
+        document.body.innerHTML += "<h2>Result:</h2><pre>" + data + "</pre>";
+      })
+      .catch(err => {
+        document.body.innerHTML += "<h2>Error:</h2><pre>" + err + "</pre>";
+      });
+  </script>
+</body>
+</html>
